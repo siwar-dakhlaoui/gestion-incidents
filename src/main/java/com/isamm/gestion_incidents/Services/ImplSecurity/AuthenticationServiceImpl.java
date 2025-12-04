@@ -7,8 +7,11 @@ import com.isamm.gestion_incidents.Models.Role;
 import com.isamm.gestion_incidents.Models.User;
 import com.isamm.gestion_incidents.Repositories.UserRepository;
 import com.isamm.gestion_incidents.Security.AuthenticationService;
+import com.isamm.gestion_incidents.Security.EmailService;
+import com.isamm.gestion_incidents.Security.EmailVerificationService;
 import com.isamm.gestion_incidents.Security.JwtService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +24,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final EmailVerificationService emailVerificationService;
+
+    @Autowired
+    private EmailService emailService;
     @Override
     public JwtAuthenticationResponse SignUp(SignUpRequest request) {
 
@@ -38,6 +45,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .role(role)
                 .build();
         userRepository.save(user);
+        emailVerificationService.sendVerificationEmail(user);
 
         var jwtToken = jwtService.generateToken(user);
 
@@ -46,6 +54,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .accessToken(jwtToken)
                 .userId(user.getId())
                 .role(user.getRole().name())
+                .isVerified(false)
                 .build();
     }
 
@@ -62,6 +71,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid Email or Password"));
 
+        // check if user is verified
+        if (!user.isVerified()){
+            throw new RuntimeException("Account not verified"+
+                    "Please check your email for verification link");
+        }
+
 
 
         var jwtToken = jwtService.generateToken(user);
@@ -70,6 +85,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .accessToken(jwtToken)
                 .userId(user.getId())
                 .role(user.getRole().name())
+                .isVerified(user.isVerified())
                 .build();
 
     }
