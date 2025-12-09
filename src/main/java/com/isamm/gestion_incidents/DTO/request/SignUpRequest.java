@@ -18,7 +18,8 @@ public class SignUpRequest {
     private String firstName;
     private String lastName;
     @Enumerated(EnumType.STRING)
-    Role role;
+    @Builder.Default
+    private Role role = Role.CITOYEN;
 
 
 }
