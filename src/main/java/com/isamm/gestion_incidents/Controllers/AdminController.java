@@ -1,7 +1,7 @@
 /*package com.isamm.gestion_incidents.Controllers;
 
 import ch.qos.logback.core.model.Model;
-import com.isamm.gestion_incidents.Models.Role;
+import com.isamm.gestion_incidents.Enum.Role;
 import com.isamm.gestion_incidents.Security.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;

@@ -1,11 +1,11 @@
 package com.isamm.gestion_incidents.Models;
 
+import com.isamm.gestion_incidents.Enum.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -56,6 +56,11 @@ public class User implements UserDetails {
 
     @Column(name = "is_enabled" ,nullable = false)
     private boolean isEnabled= true;
+
+    @ManyToOne
+    @JoinColumn(name = "quartier_id")
+    private Quartier quartier; // Pour les agents municipaux
+
 
 
     @Override

@@ -3,7 +3,7 @@ package com.isamm.gestion_incidents.Controllers;
 import com.isamm.gestion_incidents.DTO.request.SignInRequest;
 import com.isamm.gestion_incidents.DTO.request.SignUpRequest;
 import com.isamm.gestion_incidents.DTO.response.JwtAuthenticationResponse;
-import com.isamm.gestion_incidents.Models.Role;
+import com.isamm.gestion_incidents.Enum.Role;
 import com.isamm.gestion_incidents.Security.AuthenticationService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;

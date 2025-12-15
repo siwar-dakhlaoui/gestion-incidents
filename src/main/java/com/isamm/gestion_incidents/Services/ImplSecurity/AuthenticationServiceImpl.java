@@ -3,7 +3,7 @@ package com.isamm.gestion_incidents.Services.ImplSecurity;
 import com.isamm.gestion_incidents.DTO.request.SignInRequest;
 import com.isamm.gestion_incidents.DTO.request.SignUpRequest;
 import com.isamm.gestion_incidents.DTO.response.JwtAuthenticationResponse;
-import com.isamm.gestion_incidents.Models.Role;
+import com.isamm.gestion_incidents.Enum.Role;
 import com.isamm.gestion_incidents.Models.User;
 import com.isamm.gestion_incidents.Repositories.UserRepository;
 import com.isamm.gestion_incidents.Security.AuthenticationService;

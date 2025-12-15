@@ -1,6 +1,5 @@
 package com.isamm.gestion_incidents.DTO.response;
 
-import com.isamm.gestion_incidents.Models.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
