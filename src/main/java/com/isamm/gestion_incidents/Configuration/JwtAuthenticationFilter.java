@@ -25,9 +25,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserService userService;
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getServletPath();
+        // Ne pas appliquer le filtre JWT pour les pages Thymeleaf
+        return path.startsWith("/user/") ||
+                path.startsWith("/css/") ||
+                path.startsWith("/js/") ||
+                path.startsWith("/images/") ||
+                path.equals("/favicon.ico");
+    }
+
+    @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-
 
         String jwt = parseJwt(request);
 
@@ -51,11 +61,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String parseJwt(HttpServletRequest request) {
-        String authHeader = request.getHeader
-                ("Authorization");
+        String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             return authHeader.substring(7);
         }
+
+        // Essayer de récupérer le token depuis les cookies (pour Thymeleaf)
+        if (request.getCookies() != null) {
+            for (var cookie : request.getCookies()) {
+                if ("token".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+
         return null;
     }
 }

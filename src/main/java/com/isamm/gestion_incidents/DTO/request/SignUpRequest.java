@@ -1,6 +1,6 @@
 package com.isamm.gestion_incidents.DTO.request;
 
-import com.isamm.gestion_incidents.Models.Role;
+import com.isamm.gestion_incidents.Enum.Role;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
@@ -18,7 +18,8 @@ public class SignUpRequest {
     private String firstName;
     private String lastName;
     @Enumerated(EnumType.STRING)
-    Role role;
+    @Builder.Default
+    private Role role = Role.CITOYEN;
 
 
 }
