@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -33,6 +34,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth
                         // Autoriser les pages Thymeleaf publiques
                         .requestMatchers(
+                                "/",
                                 "/user/signin",
                                 "/user/signup",
                                 "/user/signin/**",
@@ -41,37 +43,36 @@ public class SecurityConfiguration {
                                 "/css/**",
                                 "/js/**",
                                 "/images/**",
+                                "/static/**",
                                 "/webjars/**",
                                 "/favicon.ico",
-                                "/error"
+                                "/error",
+                                "/error/**"
                         ).permitAll()
-                        // Autoriser l'accès aux templates
-                        .requestMatchers(
-                                "/templates/**",
-                                "/static/**"
-                        ).permitAll()
+                        .requestMatchers("/citoyen/**").hasRole("CITOYEN")
+                        .requestMatchers("/agent/**").hasRole("AGENT_MUNICIPAL")
+                        .requestMatchers("/admin/**").hasRole("ADMINISTRATEUR")
                         .anyRequest().authenticated()
                 )
-                // Configuration pour Thymeleaf (avec session)
-                .formLogin(form -> form
-                        .loginPage("/user/signin")  // Page de login personnalisée
-                        .loginProcessingUrl("/user/signin")  // URL de traitement
-                        .defaultSuccessUrl("/dashboard", true)
-                        .failureUrl("/user/signin?error=true")
-                        .permitAll()
-                )
+                // DÉSACTIVER formLogin - vous gérez l'authentification dans vos contrôleurs
+                .formLogin(form -> form.disable())
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/user/signin?logout=true")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID", "token", "userId", "role")
                         .permitAll()
                 )
-                // Ajouter le filtre JWT avant le filtre d'authentification
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.sendRedirect("/user/signin");
+                        })
+                )
+                // Ajouter le filtre JWT
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                // Session management pour supporter à la fois API et Thymeleaf
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)  // Changé de STATELESS
-                        .maximumSessions(1)
-                        .expiredUrl("/user/signin?expired=true")
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .sessionFixation().migrateSession()
                 );
 
         return http.build();
@@ -89,7 +90,13 @@ public class SecurityConfiguration {
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
-
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return username -> {
+            // Utiliser votre service UserService
+            return userService.userDetailsService().loadUserByUsername(username);
+        };
+    }
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
