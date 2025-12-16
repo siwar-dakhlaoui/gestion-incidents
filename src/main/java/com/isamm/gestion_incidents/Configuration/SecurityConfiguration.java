@@ -11,7 +11,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -47,32 +46,28 @@ public class SecurityConfiguration {
                                 "/css/**",
                                 "/js/**",
                                 "/images/**",
+                                "/static/**",
                                 "/webjars/**",
                                 "/favicon.ico",
                                 "/error",
-                                "/api/init/**"
+                           "/error/**",
+
+                                
                         ).permitAll()
 
-                        // Routes ADMIN - DOIT avoir ROLE_ADMINISTRATEUR
-                        .requestMatchers("/admin/**").hasRole("ADMINISTRATEUR")
-                        .requestMatchers("/api/admin/**").hasRole("ADMINISTRATEUR")
-
-                        // Routes AGENT
+                      .requestMatchers("/citoyen/**").hasRole("CITOYEN")
                         .requestMatchers("/agent/**").hasRole("AGENT_MUNICIPAL")
-
-                        // Routes CITOYEN
-                        .requestMatchers("/citoyen/**").hasRole("CITOYEN")
-
-                        // Toutes les autres routes nécessitent une authentification
+                        .requestMatchers("/admin/**").hasRole("ADMINISTRATEUR")
                         .anyRequest().authenticated()
                 )
-                .formLogin(form -> form
-                        .loginPage("/user/signin")
-                        .loginProcessingUrl("/user/signin")
-                        .defaultSuccessUrl("/dashboard", true)
-                        .failureUrl("/user/signin?error=true")
-                        .permitAll()
-                )
+              
+                               
+                      
+                        
+                
+                // DÉSACTIVER formLogin - vous gérez l'authentification dans vos contrôleurs
+                .formLogin(form -> form.disable())
+
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/user/signin?logout=true")
@@ -80,10 +75,19 @@ public class SecurityConfiguration {
                         .deleteCookies("token", "JSESSIONID")
                         .permitAll()
                 )
-                // Ajouter le filtre JWT AVANT le filtre d'authentification par formulaire
+            
+                
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.sendRedirect("/user/signin");
+                        })
+                )
+                // Ajouter le filtre JWT
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)  // Important pour JWT
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .sessionFixation().migrateSession()
+
                 );
 
         return http.build();
@@ -101,7 +105,13 @@ public class SecurityConfiguration {
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
-
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return username -> {
+            // Utiliser votre service UserService
+            return userService.userDetailsService().loadUserByUsername(username);
+        };
+    }
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
