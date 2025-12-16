@@ -10,11 +10,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 @RequiredArgsConstructor
 public class JwtConfig {
 
-    private final JwtService jwtService;
+/*    private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
         return new JwtAuthenticationFilter(jwtService, userDetailsService);
-    }
+    }*/
 }
