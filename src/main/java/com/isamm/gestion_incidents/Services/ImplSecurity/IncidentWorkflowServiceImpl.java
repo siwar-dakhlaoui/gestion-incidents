@@ -1,6 +1,7 @@
 package com.isamm.gestion_incidents.Services.ImplSecurity;
 
 import com.isamm.gestion_incidents.Enum.IncidentStatus;
+import com.isamm.gestion_incidents.Exception.ResourceNotFoundException;
 import com.isamm.gestion_incidents.Models.Incident;
 import com.isamm.gestion_incidents.Models.User;
 import com.isamm.gestion_incidents.Repositories.IncidentRepository;
@@ -11,12 +12,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class IncidentWorkflowServiceImpl implements IncidentWorkflowService {
 
-  /* private final IncidentRepository incidentRepository;
+   private final IncidentRepository incidentRepository;
     private final UserRepository userRepository;
 
     private Incident getIncident(Long id) {
@@ -47,7 +50,7 @@ public class IncidentWorkflowServiceImpl implements IncidentWorkflowService {
         }
     }
 
-   /* @Override
+    @Override
     @PreAuthorize("hasRole('ADMINISTRATEUR')")
     public void assignToAgent(Long incidentId, Long agentId) {
         Incident incident = getIncident(incidentId);
@@ -85,5 +88,5 @@ public class IncidentWorkflowServiceImpl implements IncidentWorkflowService {
         validateTransition(incident.getStatus(), IncidentStatus.CLOTURE);
         incident.setStatus(IncidentStatus.CLOTURE);
         incidentRepository.save(incident);
-    }*/
+    }
 }
