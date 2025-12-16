@@ -1,6 +1,5 @@
 package com.isamm.gestion_incidents.Configuration;
 
-import com.isamm.gestion_incidents.Security.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,29 +16,33 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
+@EnableMethodSecurity(
+        securedEnabled = true,
+        jsr250Enabled = true,
+        prePostEnabled = true  // IMPORTANT: Active @PreAuthorize
+)
 @RequiredArgsConstructor
 public class SecurityConfiguration {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final UserService userService;
+    private final UserDetailsService userDetailsService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // Autoriser les pages Thymeleaf publiques
+                        // Routes publiques
                         .requestMatchers(
                                 "/",
                                 "/user/signin",
                                 "/user/signup",
-                                "/user/signin/**",
-                                "/user/signup/**",
                                 "/auth/**",
+                                "/api/auth/**",
                                 "/css/**",
                                 "/js/**",
                                 "/images/**",
@@ -47,22 +50,33 @@ public class SecurityConfiguration {
                                 "/webjars/**",
                                 "/favicon.ico",
                                 "/error",
-                                "/error/**"
+                           "/error/**",
+
+                                
                         ).permitAll()
-                        .requestMatchers("/citoyen/**").hasRole("CITOYEN")
+
+                      .requestMatchers("/citoyen/**").hasRole("CITOYEN")
                         .requestMatchers("/agent/**").hasRole("AGENT_MUNICIPAL")
                         .requestMatchers("/admin/**").hasRole("ADMINISTRATEUR")
                         .anyRequest().authenticated()
                 )
+              
+                               
+                      
+                        
+                
                 // DÉSACTIVER formLogin - vous gérez l'authentification dans vos contrôleurs
                 .formLogin(form -> form.disable())
+
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/user/signin?logout=true")
                         .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID", "token", "userId", "role")
+                        .deleteCookies("token", "JSESSIONID")
                         .permitAll()
                 )
+            
+                
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.sendRedirect("/user/signin");
@@ -73,6 +87,7 @@ public class SecurityConfiguration {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                         .sessionFixation().migrateSession()
+
                 );
 
         return http.build();
@@ -86,7 +101,7 @@ public class SecurityConfiguration {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userService.userDetailsService());
+        authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
