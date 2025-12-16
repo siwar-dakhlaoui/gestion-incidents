@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord Citoyen</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .dashboard-card {
+            transition: transform 0.3s;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .user-info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+        }
+
+        .stat-card.primary { background-color: #4a6fa5; }
+        .stat-card.success { background-color: #28a745; }
+        .stat-card.warning { background-color: #ffc107; color: #333; }
+        .stat-card.danger  { background-color: #dc3545; }
+    </style>
+</head>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<body>
+<div th:if="${successMessage}"
+     id="successAlert"
+     class="alert alert-success alert-dismissible fade show"
+     role="alert">
+
+    <strong>Succès !</strong>
+    <span th:text="${successMessage}"></span>
+
+    <button type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"></button>
+</div>
+
+
+<!-- ================= HEADER ================= -->
+<div th:replace="fragments/header :: header"></div>
+
+<div class="container-fluid">
+    <div class="row">
+
+        <!-- ================= SIDEBAR ================= -->
+        <div th:replace="fragments/sidebar :: sidebar"></div>
+
+        <!-- ================= MAIN CONTENT ================= -->
+        <main class="col-md-10 mt-4">
+
+            <!-- Infos utilisateur -->
+            <div class="user-info">
+                <h2>Bienvenue  👋</h2>
+                <p class="mb-0">Plateforme de signalement d'incidents urbains</p>
+                <small id="currentTime"></small>
+            </div>
+
+            <!-- Statistiques -->
+            <div class="row">
+                <div class="col-md-3 mb-4">
+                    <div class="stat-card primary">
+                        <h3>5</h3>
+                        <p>Incidents signalés</p>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="stat-card success">
+                        <h3>3</h3>
+                        <p>Résolus</p>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="stat-card warning">
+                        <h3>1</h3>
+                        <p>En cours</p>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="stat-card danger">
+                        <h3>1</h3>
+                        <p>En attente</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions + Derniers incidents -->
+            <div class="row">
+
+                <!-- Actions rapides -->
+                <div class="col-md-8">
+                    <div class="card dashboard-card">
+                        <div class="card-header bg-primary text-white">
+                            Actions rapides
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <a th:href="@{/citoyen/declarer}" class="btn btn-primary w-100">
+                                        <i class="bi bi-plus-circle"></i> Déclarer un incident
+                                    </a>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <a th:href="@{/citoyen/incidents}" class="btn btn-success w-100">
+                                        <i class="bi bi-list-ul"></i> Mes incidents
+                                    </a>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <a th:href="@{/citoyen/carte}" class="btn btn-info w-100">
+                                        <i class="bi bi-map"></i> Carte
+                                    </a>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <a th:href="@{/citoyen/statistiques}" class="btn btn-warning w-100">
+                                        <i class="bi bi-bar-chart"></i> Statistiques
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Derniers incidents -->
+                <div class="col-md-4">
+                    <div class="card dashboard-card">
+                        <div class="card-header bg-success text-white">
+                            Derniers incidents
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group">
+                                <li class="list-group-item">
+                                    <strong>Trou dans la chaussée</strong><br>
+                                    Rue de la République<br>
+                                    <span class="badge bg-success">Résolu</span>
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>Lampadaire défectueux</strong><br>
+                                    Avenue principale<br>
+                                    <span class="badge bg-warning text-dark">En cours</span>
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>Déchets non collectés</strong><br>
+                                    Place de la mairie<br>
+                                    <span class="badge bg-danger">En attente</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- ================= FOOTER ================= -->
+<div th:replace="fragments/footer :: footer"></div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const timeEl = document.getElementById('currentTime');
+        if (timeEl) {
+            const updateTime = () => {
+                const now = new Date();
+                timeEl.textContent =
+                    now.toLocaleDateString('fr-FR') + ' ' +
+                    now.toLocaleTimeString('fr-FR');
+            };
+            updateTime();
+            setInterval(updateTime, 60000);
+        }
+    });
+</script>
+<script>
+    setTimeout(() => {
+        const alert = document.getElementById("successAlert");
+        if (alert) {
+            alert.classList.remove("show");
+            alert.classList.add("fade");
+
+            setTimeout(() => alert.remove(), 500);
+        }
+    }, 5000); // 5 secondes
+</script>
+
+</body>
+</html>
