@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Déclarer un incident</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <style>
+        #map { height: 300px; }
+    </style>
+</head>
+
+<body class="bg-light">
+
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h4>📍 Déclaration d’un incident</h4>
+        </div>
+
+        <div class="card-body">
+
+            <!-- MESSAGE SUCCÈS -->
+            <div th:if="${success}" class="alert alert-success">
+                Incident déclaré avec succès ✅
+            </div>
+
+            <!-- MESSAGE ERREUR -->
+            <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+            <form th:action="@{/citoyen/declarer}"
+                  th:object="${incident}"
+                  method="post"
+                  enctype="multipart/form-data">
+
+                <!-- Titre -->
+                <div class="mb-3">
+                    <label class="form-label">Titre *</label>
+                    <input type="text" th:field="*{titre}" class="form-control">
+                </div>
+
+                <!-- Description -->
+                <div class="mb-3">
+                    <label class="form-label">Description *</label>
+                    <textarea th:field="*{description}" class="form-control"></textarea>
+                </div>
+
+                <!-- Catégorie -->
+                <div class="mb-3">
+                    <label class="form-label">Catégorie *</label>
+                    <select th:field="*{category}" class="form-select">
+                        <option value="">-- Choisir --</option>
+                        <option th:each="c : ${categories}"
+                                th:value="${c}"
+                                th:text="${c}">
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Géolocalisation -->
+                <h5>📍 Géolocalisation</h5>
+
+                <!-- GEOLOCALISATION -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Localisation de l'incident</label>
+
+                    <!-- Choix -->
+                    <div class="btn-group mb-3 w-100">
+                        <button type="button" class="btn btn-outline-primary" onclick="showAddress()">
+                            📍 Adresse
+                        </button>
+                        <button type="button" class="btn btn-outline-success" onclick="showMap()">
+                            🗺️ Carte
+                        </button>
+                        <button type="button" class="btn btn-outline-warning" onclick="useGPS()">
+                            📡 GPS
+                        </button>
+                    </div>
+
+                    <!-- ADRESSE -->
+                    <div id="addressDiv" style="display:none;">
+                        <input type="text" class="form-control"
+                               placeholder="Saisir l'adresse"
+                               th:field="*{adresse}">
+                    </div>
+
+                    <!-- CARTE -->
+                    <div id="mapDiv" style="display:none;">
+                        <div id="map" style="height:300px;"></div>
+                    </div>
+
+                    <!-- GPS -->
+                    <div id="gpsDiv" class="alert alert-info mt-2" style="display:none;">
+                        📡 Position GPS détectée automatiquement
+                    </div>
+
+                    <!-- Champs cachés -->
+                    <input type="hidden" th:field="*{latitude}">
+                    <input type="hidden" th:field="*{longitude}">
+                </div>
+
+
+                <!-- Photos -->
+                <div class="mb-3 mt-3">
+                    <label>Photos</label>
+                    <input type="file" name="photos" multiple class="form-control">
+                </div>
+
+                <button type="submit" class="btn btn-success w-100">
+                    Envoyer
+                </button>
+
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+    let map, marker;
+
+    function hideAll() {
+        document.getElementById("addressDiv").style.display = "none";
+        document.getElementById("mapDiv").style.display = "none";
+        document.getElementById("gpsDiv").style.display = "none";
+    }
+
+    function showAddress() {
+        hideAll();
+        document.getElementById("addressDiv").style.display = "block";
+    }
+
+    function showMap() {
+        hideAll();
+        document.getElementById("mapDiv").style.display = "block";
+
+        if (!map) {
+            map = L.map('map').setView([36.8, 10.18], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
+                .addTo(map);
+
+            map.on('click', function (e) {
+                if (marker) map.removeLayer(marker);
+                marker = L.marker(e.latlng).addTo(map);
+
+                document.querySelector('[name="latitude"]').value = e.latlng.lat;
+                document.querySelector('[name="longitude"]').value = e.latlng.lng;
+            });
+        }
+    }
+
+    function useGPS() {
+        hideAll();
+        document.getElementById("gpsDiv").style.display = "block";
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (pos) {
+                document.querySelector('[name="latitude"]').value = pos.coords.latitude;
+                document.querySelector('[name="longitude"]').value = pos.coords.longitude;
+            }, function () {
+                alert("Impossible d'accéder au GPS");
+            });
+        } else {
+            alert("GPS non supporté");
+        }
+    }
+</script>
+
+</body>
+</html>

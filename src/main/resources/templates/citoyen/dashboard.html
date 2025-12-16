@@ -47,8 +47,23 @@
         .stat-card.danger  { background-color: #dc3545; }
     </style>
 </head>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <body>
+<div th:if="${successMessage}"
+     id="successAlert"
+     class="alert alert-success alert-dismissible fade show"
+     role="alert">
+
+    <strong>Succès !</strong>
+    <span th:text="${successMessage}"></span>
+
+    <button type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"></button>
+</div>
+
 
 <!-- ================= HEADER ================= -->
 <div th:replace="fragments/header :: header"></div>
@@ -113,6 +128,7 @@
                                         <i class="bi bi-plus-circle"></i> Déclarer un incident
                                     </a>
                                 </div>
+
                                 <div class="col-md-6 mb-3">
                                     <a th:href="@{/citoyen/incidents}" class="btn btn-success w-100">
                                         <i class="bi bi-list-ul"></i> Mes incidents
@@ -186,6 +202,17 @@
             setInterval(updateTime, 60000);
         }
     });
+</script>
+<script>
+    setTimeout(() => {
+        const alert = document.getElementById("successAlert");
+        if (alert) {
+            alert.classList.remove("show");
+            alert.classList.add("fade");
+
+            setTimeout(() => alert.remove(), 500);
+        }
+    }, 5000); // 5 secondes
 </script>
 
 </body>

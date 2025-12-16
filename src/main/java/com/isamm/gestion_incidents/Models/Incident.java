@@ -4,6 +4,7 @@ import com.isamm.gestion_incidents.Enum.IncidentCategory;
 import com.isamm.gestion_incidents.Enum.IncidentStatus;
 import com.isamm.gestion_incidents.Enum.PriorityLevel;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -55,6 +56,10 @@ public class Incident {
     @Enumerated(EnumType.STRING)
     private PriorityLevel priorite;
 
+   /*@OneToMany(mappedBy = "incident", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Photo> photos;*/
+    @ElementCollection
+    private List<String> photos;
     @PrePersist
     protected void onCreate() {
         dateDeclaration = LocalDateTime.now();
@@ -73,5 +78,8 @@ public class Incident {
 
     public void setResolvedAt(LocalDateTime now) {
 
+    }
+
+    public void setCategory(@NotNull(message = "La catégorie est obligatoire") IncidentCategory category) {
     }
 }
