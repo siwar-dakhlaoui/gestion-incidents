@@ -1,5 +1,6 @@
 package com.isamm.gestion_incidents.Services.ImplSecurity;
 
+import com.isamm.gestion_incidents.DTO.request.AdminCreateUserRequest;
 import com.isamm.gestion_incidents.DTO.request.SignInRequest;
 import com.isamm.gestion_incidents.DTO.request.SignUpRequest;
 import com.isamm.gestion_incidents.DTO.response.JwtAuthenticationResponse;
@@ -46,7 +47,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
 
         try {
-            Role role = request.getRole() != null ? request.getRole() : Role.CITOYEN;
+            Role role = Role.CITOYEN;
+
 
             // CRÉER LE TOKEN DE VÉRIFICATION
             String verificationToken = UUID.randomUUID().toString();
@@ -117,4 +119,5 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .isVerified(user.isVerified())
                 .build();
     }
+
 }
