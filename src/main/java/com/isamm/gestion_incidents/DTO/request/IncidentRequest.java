@@ -1,15 +1,24 @@
 package com.isamm.gestion_incidents.DTO.request;
 
 import com.isamm.gestion_incidents.Enum.IncidentCategory;
-import org.antlr.v4.runtime.misc.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
+@Data
 public class IncidentRequest {
- //   @NotBlank
-    private String description;
 
-    @NotNull
-    private IncidentCategory category;
+   @NotBlank
+   private String titre;
 
-    @NotNull
-    private Long quartierId;
+   @NotBlank
+   private String description;
+
+   @NotNull
+   private IncidentCategory category;
+
+   private String adresse;
+
+   private Double latitude;
+   private Double longitude;
 }
