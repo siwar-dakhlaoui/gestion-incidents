@@ -1,6 +1,7 @@
 package com.isamm.gestion_incidents.Services.Impl;
 
 import com.isamm.gestion_incidents.DTO.request.IncidentRequest;
+import com.isamm.gestion_incidents.Enum.IncidentStatus;
 import com.isamm.gestion_incidents.Models.Incident;
 import com.isamm.gestion_incidents.Models.User;
 import com.isamm.gestion_incidents.Repositories.IncidentRepository;
@@ -49,6 +50,50 @@ public class IncidentServiceImpl implements IncidentService {
                 .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
 
         return incidentRepository.findByCitoyen(citoyen);
+    }
+    @Override
+    public Incident getIncidentForEdit(Long id, String email) {
+        User citoyen = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
+
+        Incident incident = incidentRepository.findByIdAndCitoyen(id, citoyen)
+                .orElseThrow(() -> new RuntimeException("Incident introuvable"));
+
+        if (incident.getStatut() != IncidentStatus.SIGNALE) {
+            throw new RuntimeException("Incident non modifiable");
+        }
+
+        return incident;
+    }
+
+    @Override
+    public void updateIncident(
+            Long id,
+            IncidentRequest request,
+            MultipartFile[] newPhotos,
+            String emailCitoyen
+    ) {
+        Incident incident = getIncidentForEdit(id, emailCitoyen);
+
+        incident.setTitre(request.getTitre());
+        incident.setDescription(request.getDescription());
+        incident.setCategorie(request.getCategory());
+        incident.setAdresse(request.getAdresse());
+        incident.setLatitude(request.getLatitude());
+        incident.setLongitude(request.getLongitude());
+
+        if (newPhotos != null && newPhotos.length > 0) {
+            List<String> fichiers = fileStorageService.saveFiles(newPhotos);
+            incident.getPhotos().addAll(fichiers);
+        }
+
+        incidentRepository.save(incident);
+    }
+
+    @Override
+    public void deleteIncident(Long id, String emailCitoyen) {
+        Incident incident = getIncidentForEdit(id, emailCitoyen);
+        incidentRepository.delete(incident);
     }
 
 }

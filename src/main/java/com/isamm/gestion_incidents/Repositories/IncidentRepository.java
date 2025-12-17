@@ -13,10 +13,14 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface IncidentRepository extends JpaRepository<Incident, Long> {
     List<Incident> findByCitoyen(User citoyen);
+    Optional<Incident> findByIdAndCitoyen(Long id, User citoyen);
+    List<Incident> findAll();
+
 
   /*  // Trouver les incidents d'un citoyen
     Page<Incident> findByCitoyen(User citoyen, Pageable pageable);
