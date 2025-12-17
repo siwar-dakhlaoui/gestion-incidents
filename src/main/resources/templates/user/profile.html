@@ -69,19 +69,19 @@
             <i class="bi bi-person-circle"></i> Mon Profil
         </a>
         <div class="d-flex align-items-center">
-            <!-- Bouton retour -->
-            <a th:if="${role == 'AGENT_MUNICIPAL'}" th:href="@{/agent/dashboard}" class="btn btn-outline-light me-2">
-                <i class="bi bi-arrow-left"></i> Retour
+            <!-- Bouton retour avec redirection selon le rôle -->
+            <a th:if="${role == 'AGENT_MUNICIPAL'}" href="/agent/dashboard" class="btn btn-outline-light me-2">
+                <i class="bi bi-arrow-left"></i> Retour Dashboard
             </a>
-            <a th:if="${role == 'ADMINISTRATEUR'}" th:href="@{/admin/dashboard}" class="btn btn-outline-light me-2">
-                <i class="bi bi-arrow-left"></i> Retour
+            <a th:if="${role == 'ADMINISTRATEUR'}" href="/admin/dashboard" class="btn btn-outline-light me-2">
+                <i class="bi bi-arrow-left"></i> Retour Dashboard
             </a>
-            <a th:if="${role == 'CITOYEN'}" th:href="@{/citoyen/dashboard}" class="btn btn-outline-light me-2">
-                <i class="bi bi-arrow-left"></i> Retour
+            <a th:if="${role == 'CITOYEN'}" href="/citoyen/dashboard" class="btn btn-outline-light me-2">
+                <i class="bi bi-arrow-left"></i> Retour Dashboard
             </a>
 
             <!-- Bouton déconnexion -->
-            <a th:href="@{/user/logout}" class="btn btn-outline-light">
+            <a href="/user/logout" class="btn btn-outline-light">
                 <i class="bi bi-box-arrow-right"></i> Déconnexion
             </a>
         </div>
@@ -112,7 +112,10 @@
                 </div>
                 <h2 th:text="${user.firstName + ' ' + user.lastName}">Nom Prénom</h2>
                 <p class="mb-0">
-                    <span class="badge bg-light text-dark badge-role" th:text="${role}">ROLE</span>
+                    <!-- Affichage du rôle avec badge coloré -->
+                    <span th:if="${role == 'CITOYEN'}" class="badge bg-info badge-role">Citoyen</span>
+                    <span th:if="${role == 'AGENT_MUNICIPAL'}" class="badge bg-warning text-dark badge-role">Agent Municipal</span>
+                    <span th:if="${role == 'ADMINISTRATEUR'}" class="badge bg-danger badge-role">Administrateur</span>
                 </p>
             </div>
         </div>
@@ -148,53 +151,126 @@
                     </div>
                 </div>
 
-                <!-- Informations de contact -->
+                <!-- Informations de compte -->
                 <div class="col-md-6">
                     <div class="info-card">
                         <h6><i class="bi bi-calendar text-primary me-2"></i>Informations de Compte</h6>
-                        <div class="mb-2">
+
+                        <!-- Date d'inscription avec gestion du null -->
+                        <div th:if="${user.dateInscription != null}" class="mb-2">
                             <strong>Date d'inscription :</strong>
                             <span th:text="${#dates.format(user.dateInscription, 'dd/MM/yyyy')}" class="ms-2"></span>
                         </div>
+                        <div th:unless="${user.dateInscription != null}" class="mb-2">
+                            <strong>Date d'inscription :</strong>
+                            <span class="ms-2 text-muted">Non spécifiée</span>
+                        </div>
+
                         <div class="mb-2">
                             <strong>Statut du compte :</strong>
                             <span th:if="${user.enabled}" class="badge bg-success ms-2">Activé</span>
                             <span th:unless="${user.enabled}" class="badge bg-danger ms-2">Désactivé</span>
                         </div>
+
+                        <!-- Quartier -->
                         <div th:if="${user.quartier != null}">
                             <strong>Quartier :</strong>
                             <span th:text="${user.quartier.nom}" class="ms-2 badge bg-info"></span>
+                        </div>
+                        <div th:unless="${user.quartier != null}">
+                            <strong>Quartier :</strong>
+                            <span class="ms-2 text-muted">Non spécifié</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Actions -->
+            <!-- Actions - Boutons fonctionnels -->
             <div class="mt-4 pt-3 border-top">
                 <h5 class="mb-3">
                     <i class="bi bi-gear text-primary me-2"></i>Gestion du Compte
                 </h5>
+
                 <div class="row">
-                    <div class="col-md-6 mb-2">
-                        <a th:href="@{/user/profile/edit}" class="btn btn-outline-primary w-100 btn-action">
+                    <!-- Bouton Modifier le profil -->
+                    <div class="col-md-6 mb-3">
+                        <a href="/user/profile/edit" class="btn btn-outline-primary w-100 btn-action">
                             <i class="bi bi-pencil-square me-2"></i>Modifier le profil
                         </a>
                     </div>
-                    <div class="col-md-6 mb-2">
-                        <a th:href="@{/user/profile/change-password}" class="btn btn-outline-secondary w-100 btn-action">
+
+                    <!-- Bouton Changer le mot de passe -->
+                    <div class="col-md-6 mb-3">
+                        <a href="/user/profile/change-password" class="btn btn-outline-secondary w-100 btn-action">
                             <i class="bi bi-key me-2"></i>Changer le mot de passe
                         </a>
                     </div>
                 </div>
+
+                <!-- Boutons supplémentaires selon le rôle -->
                 <div class="row mt-2">
+                    <!-- Pour les administrateurs : Gestion des utilisateurs -->
+                    <div class="col-12" th:if="${role == 'ADMINISTRATEUR'}">
+                        <a href="/admin/users" class="btn btn-info w-100 mb-2 btn-action">
+                            <i class="bi bi-people me-2"></i>Gérer les utilisateurs
+                        </a>
+                    </div>
+
+                    <!-- Pour les agents municipaux : Voir les signalements -->
+                    <div class="col-12" th:if="${role == 'AGENT_MUNICIPAL'}">
+                        <a href="/agent/signalements" class="btn btn-success w-100 mb-2 btn-action">
+                            <i class="bi bi-clipboard-check me-2"></i>Voir les signalements
+                        </a>
+                    </div>
+
+                    <!-- Pour les citoyens : Faire un signalement -->
+                    <div class="col-12" th:if="${role == 'CITOYEN'}">
+                        <a href="/citoyen/nouveau-signalement" class="btn btn-warning w-100 mb-2 btn-action">
+                            <i class="bi bi-plus-circle me-2"></i>Faire un signalement
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Message informatif -->
+                <div class="row mt-3">
                     <div class="col-12">
-                        <div class="alert alert-info p-2 mb-0">
-                            <small>
-                                <i class="bi bi-info-circle me-1"></i>
-                                Vous pouvez modifier vos informations personnelles et changer votre mot de passe en toute sécurité.
-                            </small>
+                        <div class="alert alert-info p-3">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-info-circle-fill me-3 fs-5"></i>
+                                <div>
+                                    <small>
+                                        <strong>Information :</strong> Vous pouvez modifier vos informations personnelles
+                                        et changer votre mot de passe en toute sécurité. Toutes les modifications sont
+                                        enregistrées dans notre système sécurisé.
+                                    </small>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pied de carte avec informations -->
+        <div class="card-footer bg-light">
+            <div class="row text-center">
+                <div class="col-md-4 mb-2 mb-md-0">
+                    <small class="text-muted">
+                        <i class="bi bi-shield-check me-1"></i>
+                        Sécurité maximale
+                    </small>
+                </div>
+                <div class="col-md-4 mb-2 mb-md-0">
+                    <small class="text-muted">
+                        <i class="bi bi-clock-history me-1"></i>
+                        Dernière connexion : Aujourd'hui
+                    </small>
+                </div>
+                <div class="col-md-4">
+                    <small class="text-muted">
+                        <i class="bi bi-question-circle me-1"></i>
+                        <a href="/aide" class="text-decoration-none">Besoin d'aide ?</a>
+                    </small>
                 </div>
             </div>
         </div>
@@ -202,22 +278,46 @@
 </div>
 
 <!-- Footer général -->
-<footer class="bg-dark text-white py-3 mt-5">
+<footer class="bg-dark text-white py-4 mt-5">
     <div class="container">
+        <div class="row">
+            <div class="col-md-6 mb-3 mb-md-0">
+                <h6 class="mb-3">Plateforme de Signalement d'Incidents Urbains</h6>
+                <p class="small mb-0">
+                    Système de gestion des signalements urbains pour une ville plus propre et plus sûre.
+                </p>
+            </div>
+            <div class="col-md-3 mb-3 mb-md-0">
+                <h6 class="mb-3">Liens rapides</h6>
+                <ul class="list-unstyled small">
+                    <li><a href="/aide" class="text-white text-decoration-none">Centre d'aide</a></li>
+                    <li><a href="/contact" class="text-white text-decoration-none">Contact</a></li>
+                    <li><a href="/confidentialite" class="text-white text-decoration-none">Confidentialité</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h6 class="mb-3">Contact</h6>
+                <ul class="list-unstyled small">
+                    <li><i class="bi bi-envelope me-2"></i>support@ville.fr</li>
+                    <li><i class="bi bi-telephone me-2"></i>+33 1 23 45 67 89</li>
+                </ul>
+            </div>
+        </div>
+        <hr class="bg-white my-3">
         <div class="text-center">
-            <p class="mb-0 small">© 2024 Plateforme de Signalement d'Incidents Urbains</p>
+            <p class="mb-0 small">© 2024 Plateforme de Signalement d'Incidents Urbains. Tous droits réservés.</p>
         </div>
     </div>
 </footer>
 
-<!-- Scripts -->
+<!-- Scripts Bootstrap -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Auto-dismiss alerts
+        // Auto-dismiss alerts après 5 secondes
         setTimeout(() => {
-            const alerts = document.querySelectorAll('.alert');
+            const alerts = document.querySelectorAll('.alert.alert-dismissible');
             alerts.forEach(alert => {
                 if (alert.classList.contains('alert-dismissible')) {
                     const bsAlert = new bootstrap.Alert(alert);
@@ -231,14 +331,35 @@
         buttons.forEach(button => {
             button.addEventListener('mouseenter', function() {
                 this.style.transform = 'translateY(-2px)';
-                this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+                this.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
             });
 
             button.addEventListener('mouseleave', function() {
                 this.style.transform = 'translateY(0)';
                 this.style.boxShadow = 'none';
             });
+
+            // Effet au clic
+            button.addEventListener('mousedown', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+            });
+
+            button.addEventListener('mouseup', function() {
+                this.style.transform = 'translateY(-2px)';
+                this.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            });
         });
+
+        // Confirmation pour la déconnexion
+        const logoutBtn = document.querySelector('a[href="/user/logout"]');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function(e) {
+                if (!confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+                    e.preventDefault();
+                }
+            });
+        }
     });
 </script>
 </body>
