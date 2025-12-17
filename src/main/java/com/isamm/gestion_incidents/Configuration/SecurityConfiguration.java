@@ -55,6 +55,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/admin/**").hasRole("ADMINISTRATEUR")
                         .requestMatchers("/user/profile").authenticated()
                         .requestMatchers("/user/dashboard").authenticated()
+                        
                         .anyRequest().authenticated()
                 )
                 // DÉSACTIVER formLogin - vous gérez l'authentification dans vos contrôleurs
