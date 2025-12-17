@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des Utilisateurs</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+<body>
+<div class="container mt-5">
+    <h2>Gestion des Utilisateurs</h2>
+
+    <!-- Message flash de succès -->
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+    <div class="mb-3">
+        <a th:href="@{/admin/users/create}" class="btn btn-primary">Créer un nouvel utilisateur</a>
+        <a th:href="@{/admin/dashboard}" class="btn btn-secondary">Retour au dashboard</a>
+    </div>
+
+    <!-- Liste des utilisateurs (à implémenter) -->
+    <div class="card">
+        <div class="card-header">
+            Liste des utilisateurs
+        </div>
+        <div class="card-body">
+            <p>L'utilisateur a été créé avec succès!</p>
+            <p>Utilisez le lien ci-dessus pour créer d'autres utilisateurs.</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

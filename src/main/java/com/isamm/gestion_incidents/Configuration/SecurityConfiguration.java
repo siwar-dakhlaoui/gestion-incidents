@@ -38,6 +38,8 @@ public class SecurityConfiguration {
                                 "/user/signin",
                                 "/user/signup",
                                 "/user/signin/**",
+                                "/admin/dashboard",
+                                "/user/signup/**",
                                 "/auth/**",
                                 "/css/**",
                                 "/js/**",
@@ -45,12 +47,12 @@ public class SecurityConfiguration {
                                 "/static/**",
                                 "/webjars/**",
                                 "/favicon.ico",
-                               "/error",
+                                "/error",
                                 "/error/**"
                         ).permitAll()
                         .requestMatchers("/citoyen/**").hasRole("CITOYEN")
                         .requestMatchers("/agent/**").hasRole("AGENT_MUNICIPAL")
-                       .requestMatchers("/admin/**").hasRole("ADMINISTRATEUR")
+                        .requestMatchers("/admin/**").hasRole("ADMINISTRATEUR")
                         .anyRequest().authenticated()
                 )
                 // DÉSACTIVER formLogin - vous gérez l'authentification dans vos contrôleurs
@@ -68,7 +70,7 @@ public class SecurityConfiguration {
                         })
                 )
                 // Ajouter le filtre JWT
-               .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                         .sessionFixation().migrateSession()
