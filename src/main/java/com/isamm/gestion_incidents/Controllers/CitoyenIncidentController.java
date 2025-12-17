@@ -57,5 +57,17 @@ public class CitoyenIncidentController {
         return "redirect:/citoyen/dashboard";
 
     }
+    @GetMapping("/incidents")
+    public String mesIncidents(Model model, Authentication authentication) {
+
+        String email = authentication.getName();
+
+        model.addAttribute(
+                "incidents",
+                incidentService.getIncidentsByCitoyen(email)
+        );
+
+        return "citoyen/incidents";
+    }
 
 }

@@ -16,8 +16,9 @@ import java.util.List;
 
 @Repository
 public interface IncidentRepository extends JpaRepository<Incident, Long> {
+    List<Incident> findByCitoyen(User citoyen);
 
-    // Trouver les incidents d'un citoyen
+  /*  // Trouver les incidents d'un citoyen
     Page<Incident> findByCitoyen(User citoyen, Pageable pageable);
 
     // Trouver les incidents assignés à un agent
@@ -49,5 +50,5 @@ public interface IncidentRepository extends JpaRepository<Incident, Long> {
 
     // Compter les incidents par catégorie (pour statistiques)
     @Query("SELECT i.categorie, COUNT(i) FROM Incident i GROUP BY i.categorie")
-    List<Object[]> countByCategorie();
+    List<Object[]> countByCategorie();*/
 }

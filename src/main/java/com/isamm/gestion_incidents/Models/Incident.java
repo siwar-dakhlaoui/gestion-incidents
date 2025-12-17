@@ -27,6 +27,7 @@ public class Incident {
     private String description;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "categorie", length = 50)
     private IncidentCategory categorie;
 
     @Enumerated(EnumType.STRING)
@@ -69,17 +70,20 @@ public class Incident {
 
     public IncidentStatus getStatus() {return statut;}
 
-    public void setAgent(User agent) {
+    public void setCategory(IncidentCategory category) {
+        this.categorie = category;
     }
 
     public void setStatus(IncidentStatus incidentStatus) {
+        this.statut = incidentStatus;
+    }
 
+    public void setAgent(User agent) {
+        this.agentAssigne = agent;
     }
 
     public void setResolvedAt(LocalDateTime now) {
-
+        this.dateResolution = now;
     }
 
-    public void setCategory(@NotNull(message = "La catégorie est obligatoire") IncidentCategory category) {
-    }
 }
