@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -67,33 +68,31 @@ public class IncidentServiceImpl implements IncidentService {
     }
 
     @Override
-    public void updateIncident(
-            Long id,
-            IncidentRequest request,
-            MultipartFile[] newPhotos,
-            String emailCitoyen
-    ) {
-        Incident incident = getIncidentForEdit(id, emailCitoyen);
+    public void assignerAgent(Long incidentId, Long agentId) {
 
-        incident.setTitre(request.getTitre());
-        incident.setDescription(request.getDescription());
-        incident.setCategorie(request.getCategory());
-        incident.setAdresse(request.getAdresse());
-        incident.setLatitude(request.getLatitude());
-        incident.setLongitude(request.getLongitude());
+        Incident incident = incidentRepository.findById(incidentId)
+                .orElseThrow(() -> new RuntimeException("Incident introuvable"));
 
-        if (newPhotos != null && newPhotos.length > 0) {
-            List<String> fichiers = fileStorageService.saveFiles(newPhotos);
-            incident.getPhotos().addAll(fichiers);
-        }
+        User agent = userRepository.findById(agentId)
+                .orElseThrow(() -> new RuntimeException("Agent introuvable"));
+
+
+        incident.setAgentAssigne(agent);
+
+
+        incident.setStatut(IncidentStatus.PRIS_EN_CHARGE);
+
+
+        incident.setDatePriseEnCharge(LocalDateTime.now());
+
 
         incidentRepository.save(incident);
     }
 
     @Override
-    public void deleteIncident(Long id, String emailCitoyen) {
-        Incident incident = getIncidentForEdit(id, emailCitoyen);
-        incidentRepository.delete(incident);
+    public List<Incident> findAll() {
+        return incidentRepository.findAll();
     }
-
 }
+
+

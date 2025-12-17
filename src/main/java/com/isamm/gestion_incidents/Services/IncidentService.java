@@ -15,13 +15,8 @@ public interface IncidentService {
     List<Incident> getIncidentsByCitoyen(String email);
     Incident getIncidentForEdit(Long id, String email);
 
-    void updateIncident(
-            Long id,
-            IncidentRequest request,
-            MultipartFile[] newPhotos,
-            String emailCitoyen
-    );
+    void assignerAgent(Long incidentId, Long agentId);
 
-    void deleteIncident(Long id, String emailCitoyen);
+    List<Incident> findAll();
 
 }
