@@ -42,4 +42,13 @@ public class IncidentServiceImpl implements IncidentService {
 
         incidentRepository.save(incident);
     }
+    @Override
+    public List<Incident> getIncidentsByCitoyen(String email) {
+
+        User citoyen = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
+
+        return incidentRepository.findByCitoyen(citoyen);
+    }
+
 }
