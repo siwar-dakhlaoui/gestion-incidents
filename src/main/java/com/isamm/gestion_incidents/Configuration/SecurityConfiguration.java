@@ -38,6 +38,7 @@ public class SecurityConfiguration {
                                 "/user/signin",
                                 "/user/signup",
                                 "/user/signin/**",
+                                "/admin/dashboard",
                                 "/user/signup/**",
                                 "/auth/**",
                                 "/css/**",

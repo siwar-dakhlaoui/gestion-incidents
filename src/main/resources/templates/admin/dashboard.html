@@ -2,76 +2,433 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Tableau de bord</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de bord Admin</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+
     <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --light-bg: #f8f9fa;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            color: #333;
         }
+
         .header {
-            background-color: #333;
+            background: linear-gradient(135deg, var(--primary-color), #1a252f);
             color: white;
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-        .container {
-            max-width: 1200px;
-            margin: 20px auto;
-            padding: 20px;
+
+        .sidebar {
             background-color: white;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            min-height: calc(100vh - 76px);
+            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+            padding: 0;
         }
-        .user-info {
-            background-color: #e9ecef;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
+
+        .sidebar .nav-link {
+            color: var(--primary-color);
+            padding: 12px 20px;
+            border-left: 3px solid transparent;
+            transition: all 0.3s;
         }
-        .logout-btn {
-            background-color: #dc3545;
+
+        .sidebar .nav-link:hover {
+            background-color: rgba(44, 62, 80, 0.05);
+            border-left: 3px solid var(--secondary-color);
+            color: var(--secondary-color);
+        }
+
+        .sidebar .nav-link.active {
+            background-color: rgba(52, 152, 219, 0.1);
+            border-left: 3px solid var(--secondary-color);
+            color: var(--secondary-color);
+            font-weight: 500;
+        }
+
+        .sidebar .nav-link i {
+            width: 24px;
+            margin-right: 10px;
+        }
+
+        .main-content {
+            padding: 2rem;
+        }
+
+        .stat-card {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            height: 100%;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            opacity: 0.8;
+        }
+
+        .card-users {
+            border-top: 4px solid var(--secondary-color);
+        }
+
+        .card-incidents {
+            border-top: 4px solid var(--success-color);
+        }
+
+        .card-pending {
+            border-top: 4px solid var(--warning-color);
+        }
+
+        .card-agents {
+            border-top: 4px solid var(--danger-color);
+        }
+
+        .welcome-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 8px 15px;
-            text-decoration: none;
-            border-radius: 4px;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
         }
+
+        .quick-actions {
+            margin-top: 2rem;
+        }
+
+        .quick-action-btn {
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quick-action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            text-decoration: none;
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .quick-action-btn i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .logout-btn {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s;
+        }
+
         .logout-btn:hover {
-            background-color: #c82333;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .user-role-badge {
+            background-color: rgba(52, 152, 219, 0.1);
+            color: var(--secondary-color);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 0.9rem;
         }
     </style>
 </head>
 <body>
-<div class="header">
-    <h1>Tableau de bord</h1>
-    <a th:href="@{/logout}" class="logout-btn">Déconnexion</a>
-</div>
-
-<div class="container">
-    <div class="user-info">
-        <h3>Bienvenue !</h3>
-        <p>Vous êtes connecté avec succès.</p>
-        <p><strong>Rôle:</strong> <span th:text="${#request.getAttribute('role')}">USER</span></p>
-    </div>
-
-    <div th:if="${#request.getAttribute('role') == 'ADMIN'}">
-        <h3>Section Administrateur</h3>
-        <p>Vous avez accès aux fonctionnalités administratives.</p>
-        <!-- Ajoutez ici les liens admin -->
-    </div>
-
+<!-- Header -->
+<div class="header d-flex justify-content-between align-items-center">
     <div>
-        <h3>Menu</h3>
-        <ul>
-            <li><a href="#">Mon Profil</a></li>
-            <li><a href="#">Incidents</a></li>
-            <li><a href="#">Historique</a></li>
-            <li><a href="#">Paramètres</a></li>
-        </ul>
+        <h1 class="h3 mb-0">
+            <i class="bi bi-speedometer2 me-2"></i>Tableau de Bord Administrateur
+        </h1>
+        <p class="mb-0 text-white-50">Gestion des incidents municipaux</p>
+    </div>
+    <div class="d-flex align-items-center">
+        <div class="me-3 text-end">
+            <div class="fw-medium" th:text="${username}">Administrateur</div>
+            <div class="user-role-badge" th:text="${role}">ADMINISTRATEUR</div>
+        </div>
+        <a th:href="@{/logout}" class="btn btn-outline-light logout-btn">
+            <i class="bi bi-box-arrow-right"></i> Déconnexion
+        </a>
     </div>
 </div>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 px-0 sidebar">
+            <nav class="nav flex-column pt-3">
+                <a class="nav-link active" th:href="@{/admin/dashboard}">
+                    <i class="bi bi-speedometer2"></i> Tableau de Bord
+                </a>
+                <a class="nav-link" th:href="@{/admin/incidents}">
+                    <i class="bi bi-exclamation-triangle"></i> Incidents
+                </a>
+                <a class="nav-link" th:href="@{/admin/users}">
+                    <i class="bi bi-people"></i> Utilisateurs
+                </a>
+                <a class="nav-link" th:href="@{/admin/reports}">
+                    <i class="bi bi-bar-chart"></i> Rapports
+                </a>
+                <a class="nav-link" th:href="@{/admin/settings}">
+                    <i class="bi bi-gear"></i> Paramètres
+                </a>
+                <div class="mt-4 pt-3 border-top px-3">
+                    <h6 class="text-uppercase text-muted small fw-bold">Actions Rapides</h6>
+                    <div class="mt-2">
+                        <a th:href="@{/admin/users/create}" class="btn btn-success btn-sm w-100 mb-2">
+                            <i class="bi bi-person-plus"></i> Nouvel Utilisateur
+                        </a>
+                        <a href="#" class="btn btn-primary btn-sm w-100 mb-2">
+                            <i class="bi bi-plus-circle"></i> Nouvel Incident
+                        </a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10 main-content">
+            <!-- Messages d'alerte -->
+            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                <span th:text="${successMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <span th:text="${errorMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Welcome Card -->
+            <div class="welcome-card">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h2 class="fw-bold">Bonjour, <span th:text="${username}">Admin</span> !</h2>
+                        <p class="mb-0">Bienvenue sur votre tableau de bord d'administration. Gérez les incidents, les utilisateurs et surveillez l'activité du système.</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <i class="bi bi-shield-check" style="font-size: 4rem; opacity: 0.8;"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistiques -->
+            <div class="row mb-4">
+                <div class="col-md-3 mb-3">
+                    <div class="card stat-card card-users">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-2">Total Utilisateurs</h6>
+                                    <h3 class="fw-bold mb-0" th:text="${totalUsers}">0</h3>
+                                </div>
+                                <div class="stat-icon text-primary">
+                                    <i class="bi bi-people-fill"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                    <span class="text-success">
+                                        <i class="bi bi-arrow-up"></i> <span th:text="${activeUsers}">0</span> actifs
+                                    </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <div class="card stat-card card-incidents">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-2">Incidents Totaux</h6>
+                                    <h3 class="fw-bold mb-0" th:text="${totalIncidents}">0</h3>
+                                </div>
+                                <div class="stat-icon text-success">
+                                    <i class="bi bi-exclamation-triangle-fill"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <span class="text-muted">Signalements</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <div class="card stat-card card-pending">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-2">En Attente</h6>
+                                    <h3 class="fw-bold mb-0" th:text="${pendingIncidents}">0</h3>
+                                </div>
+                                <div class="stat-icon text-warning">
+                                    <i class="bi bi-clock-fill"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <span class="text-warning">À traiter</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <div class="card stat-card card-agents">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-2">Agents Municipaux</h6>
+                                    <h3 class="fw-bold mb-0" th:text="${activeUsers}">0</h3>
+                                </div>
+                                <div class="stat-icon text-danger">
+                                    <i class="bi bi-person-badge-fill"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <span class="text-muted">Actifs</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions Rapides -->
+            <div class="quick-actions">
+                <h4 class="mb-3">
+                    <i class="bi bi-lightning-fill text-warning me-2"></i>Actions Rapides
+                </h4>
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <a th:href="@{/admin/users/create}" class="quick-action-btn">
+                            <i class="bi bi-person-plus text-primary"></i>
+                            <h6 class="fw-bold mt-2 mb-1">Créer Utilisateur</h6>
+                            <p class="small text-muted mb-0">Ajouter un nouvel utilisateur au système</p>
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a th:href="@{/admin/incidents}" class="quick-action-btn">
+                            <i class="bi bi-eye-fill text-success"></i>
+                            <h6 class="fw-bold mt-2 mb-1">Voir Incidents</h6>
+                            <p class="small text-muted mb-0">Consulter tous les incidents signalés</p>
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a th:href="@{/admin/reports}" class="quick-action-btn">
+                            <i class="bi bi-bar-chart-fill text-info"></i>
+                            <h6 class="fw-bold mt-2 mb-1">Générer Rapport</h6>
+                            <p class="small text-muted mb-0">Créer des rapports d'activité</p>
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a th:href="@{/admin/settings}" class="quick-action-btn">
+                            <i class="bi bi-gear-fill text-secondary"></i>
+                            <h6 class="fw-bold mt-2 mb-1">Paramètres</h6>
+                            <p class="small text-muted mb-0">Configurer le système</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dernières Activités -->
+            <div class="mt-5">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">
+                            <i class="bi bi-activity me-2"></i>Activité Récente
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group list-group-flush">
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="bi bi-person-plus text-success me-2"></i>
+                                    Nouvel agent municipal ajouté
+                                </div>
+                                <span class="text-muted small">Il y a 2 heures</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="bi bi-exclamation-triangle text-warning me-2"></i>
+                                    Incident résolu: Panneau signalétique endommagé
+                                </div>
+                                <span class="text-muted small">Il y a 5 heures</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="bi bi-shield-check text-primary me-2"></i>
+                                    Mise à jour de sécurité effectuée
+                                </div>
+                                <span class="text-muted small">Hier, 14:30</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Script pour gérer les interactions
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-dismiss alerts after 5 seconds
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                var bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+
+        // Highlight active sidebar link
+        var currentPath = window.location.pathname;
+        var sidebarLinks = document.querySelectorAll('.sidebar .nav-link');
+
+        sidebarLinks.forEach(function(link) {
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+        });
+    });
+</script>
 </body>
 </html>
