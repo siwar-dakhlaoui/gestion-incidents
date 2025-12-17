@@ -70,4 +70,5 @@ public class CitoyenIncidentController {
         return "citoyen/incidents";
     }
 
+
 }

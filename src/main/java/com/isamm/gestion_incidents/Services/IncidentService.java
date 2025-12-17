@@ -13,5 +13,15 @@ public interface IncidentService {
             String emailCitoyen
     );
     List<Incident> getIncidentsByCitoyen(String email);
+    Incident getIncidentForEdit(Long id, String email);
+
+    void updateIncident(
+            Long id,
+            IncidentRequest request,
+            MultipartFile[] newPhotos,
+            String emailCitoyen
+    );
+
+    void deleteIncident(Long id, String emailCitoyen);
 
 }
